@@ -1,0 +1,18 @@
+1- Conception : L'ontologie
+	-Classes( sous-classes)
+	-Les attributs(range / domain )
+	-Les relations(range / domain )
+	-Les entités 
+
+2-Implémentation : Les requetes SparQL
+
+3-Consultation de notre ontologie via une interaface graphique (Django ) (?)
+
+
+Idées :
+-Ajouter une fonctionalitée pour voir le pourcentage de chance qu'un patient ait le Covid-19
+
+-Patient : ID, Nom , Prénom , Sexe , Age, Maladie Chronique , traitement , symptomes ,  localisation, Situation familiale , "Durée depuis dernier voyages ( jours ) ?" , Date de la fiche , durée depuis apparition des symptomes
+-Classe Symptomes : sous classes Simpotomes Covid-19 
+-Isolement Booléen ? 
+-Symptomes/Syndromes
