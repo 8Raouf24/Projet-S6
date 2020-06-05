@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 
 public class Main
 {
-
+    private static Document outputDoc;
 
     //Fonction pour le parcous recursive ainsi que pour le traitement
     public static void Exploreur(String path) throws Exception{
@@ -64,6 +64,11 @@ public class Main
                 if(nomFichier.endsWith("poeme.txt"))
                 {
                     Poeme(tr,mini_file);
+                }
+                if(nomFichier.endsWith("boitedialog.fxml"))
+                {
+                    FXML(tr,mini_file);
+                    System.out.println("fxml fini");
                 }
 
 
@@ -177,12 +182,68 @@ public class Main
         tr.transform(source,sortie);
 
         System.out.println("poeme fini");
+    }
+
+    public static void FXML(Transformer tr,File mini_file) throws Exception{
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document inputDoc = builder.parse(mini_file);
+        DOMImplementation domimp = builder.getDOMImplementation();
+        Document outputDoc = domimp.createDocument(null, null, null);
+        outputDoc.setXmlStandalone(true);
+
+        //Fichier d'entrée , parseur
+
+        //Fichier de sortie
+
+
+        Element rootOutput = outputDoc.createElement("Racine");
+
+
+        outputDoc.appendChild(rootOutput);
+
+        rootOutput.setAttribute("xmlns:fx","http://javafx.com/fxml");
+
+
+        Rec_FX(inputDoc.getDocumentElement(),outputDoc);
+
+        DOMSource source = new DOMSource(outputDoc);
+        StreamResult sortie = new StreamResult(new File("javafx.xml"));
+
+
+        tr.setOutputProperty(OutputKeys.INDENT,"yes");
+        tr.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        tr.transform(source,sortie);
 
 
 
 
+    }
 
+    //Fonction récurssive pour parcourir les elements ayant des attributs du fichiel fxml
+    private static void Rec_FX(Node node, Document outputDoc) {
+        if(node.hasAttributes()) {
+            NamedNodeMap nom = node.getAttributes();
 
+            int alength=nom.getLength();
+            for(int i=0;i<alength;i++) {
+                Attr attr=(Attr) nom.item(i);
+
+                Element element = outputDoc.createElement("texte");
+
+                element.setAttribute(attr.getName(), "x");
+
+                Node txt=outputDoc.createTextNode(attr.getValue());
+                element.appendChild(txt);
+
+                outputDoc.getDocumentElement().appendChild(element);
+            }
+        }
+
+        NodeList nl=node.getChildNodes();
+        int length=nl.getLength();
+        for(int i=0;i<length;i++)
+            Rec_FX(nl.item(i),outputDoc);
     }
 
 
