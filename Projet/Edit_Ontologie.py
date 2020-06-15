@@ -71,11 +71,21 @@ def create_medecin(nom , prenom , age , sexe):
 
 
 
+
 onto = get_ontology("F:\Raouf\Licence\L3\Web sémantique\Projet\sortie.owl").load()
 ns = "http://sararaouf.org/onto.owl#"
 
 list_class = enum_class(onto)
-#
+
+
+with open("sym.txt", "r") as f:
+   for line in f.readlines():
+      class_Symptomes = list_class[0]
+      s= class_Symptomes()
+      s.iri = ns + line
+        
+        
+       
 #for i in onto.data_properties():
 #    pass
 #    #print(i)
