@@ -79,6 +79,16 @@ public class Main {
 
         }
     }
+    public static void spaceToTabs(StringWriter s, String output) throws Exception {
+        String outputString = (s + "").replaceAll("\n            ", "\n\t\t\t");
+        outputString = outputString.replaceAll("\n        ", "\n\t\t");
+        outputString = outputString.replaceAll("\n    ", "\n\t");
+        if (output.equals("javafx.xml")){
+            outputString = outputString.replaceFirst("[\n\r]+$", "");
+        }
+        FileOutputStream fos = new FileOutputStream(new File(output));
+        fos.write(outputString.getBytes("UTF-8"));
+    }
 
     public static void Fiche(File input, Transformer tr) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -236,8 +246,11 @@ public class Main {
         DOMSource source1 = new DOMSource(doc1);
         DOMSource source2 = new DOMSource(doc2);
 
-        StreamResult sortie1 = new StreamResult(new File("fiches1.xml"));
-        StreamResult sortie2 = new StreamResult(new File("fiches2.xml"));
+        //StreamResult sortie1 = new StreamResult(new File("fiches1.xml"));
+        //StreamResult sortie2 = new StreamResult(new File("fiches2.xml"));
+        StringWriter s = new StringWriter();
+        final StreamResult sortie1 = new StreamResult(s);
+        final StreamResult sortie2 = new StreamResult(s);
 
         tr.setOutputProperty(OutputKeys.VERSION, "1.0");
         tr.setOutputProperty(OutputKeys.INDENT,"yes");
@@ -247,6 +260,8 @@ public class Main {
 
         tr.transform(source1,sortie1);
         tr.transform(source2,sortie2);
+        spaceToTabs(s,"fiches1.xml");
+        spaceToTabs(s,"fiches2.xml");
 
 
 
@@ -302,12 +317,15 @@ public class Main {
 
 
         DOMSource source = new DOMSource(outputDoc);
-        StreamResult sortie = new StreamResult(new File("renault.xml"));
+        StringWriter s = new StringWriter();
+
+        StreamResult sortie = new StreamResult(s);
 
         tr.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         tr.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC,"");
         tr.setOutputProperty(OutputKeys.INDENT, "yes");
         tr.transform(source, sortie);
+        spaceToTabs(s,"renault.xml");
     }
 
     public static String getStr(Node node){
@@ -379,13 +397,15 @@ public class Main {
         }
             //Pour écrire dans notre fichier de sortie sortie.xml
             DOMSource source = new DOMSource(outputDoc);
-            StreamResult sortie = new StreamResult(new File(output));
+            StringWriter s = new StringWriter();
+            final StreamResult sortie = new StreamResult(s);
 
             tr.setOutputProperty(OutputKeys.INDENT,"yes");
             tr.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
             tr.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "dom.dtd");
             outputDoc.setXmlStandalone(true);
             tr.transform(source,sortie);
+            spaceToTabs(s,output);
     }
 
     public static void Poeme(Transformer tr, File mini_file) throws Exception
@@ -427,7 +447,9 @@ public class Main {
             }
         }
         DOMSource source = new DOMSource(Output);
-        StreamResult sortie = new StreamResult(new File("neruda.xml"));
+        StringWriter s = new StringWriter();
+
+        StreamResult sortie = new StreamResult(s);
         Output.setXmlStandalone(true);
 
         tr.setOutputProperty(OutputKeys.INDENT,"yes");
@@ -436,6 +458,7 @@ public class Main {
         tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         Output.setXmlStandalone(true);
         tr.transform(source,sortie);
+        spaceToTabs(s,"neruda.xml");
 
         System.out.println("poeme fini");
     }
@@ -467,7 +490,8 @@ public class Main {
 
 
         DOMSource source = new DOMSource(outputDoc);
-        StreamResult sortie = new StreamResult(new File("javafx.xml"));
+        StringWriter s = new StringWriter();
+        StreamResult sortie = new StreamResult(s);
 
 
         tr.setOutputProperty(OutputKeys.INDENT,"yes");
@@ -478,6 +502,7 @@ public class Main {
         tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
         tr.transform(source,sortie);
+        spaceToTabs(s,"javafx.xml");
 
 
 
