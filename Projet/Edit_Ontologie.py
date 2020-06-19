@@ -51,13 +51,15 @@ def create_patient(nom , prenom , age , sexe , maladiechronique , traitement , s
     else:
         P.estLocalise.append(onto.search(iri="*" + daira)[0])
 
-    if (onto.search(iri="*" + maladiechronique) == []):
-        class_mch = list_class[0]
-        M = class_mch()
-        M.iri = ns + maladiechronique
-        M.estMaladeDe.append(D)
-    else:
-        P.estMaladeDe.append(onto.search(iri="*" + daira)[0])
+    list_maladiechronique = maladiechronique.split(',')
+    for j in list_maladiechronique:
+        if (onto.search(iri="*" + maladiechronique) == []):
+            class_mch = list_class[0]
+            M = class_mch()
+            M.iri = ns + maladiechronique
+            M.estMaladeDe.append(D)
+        else:
+            P.estMaladeDe.append(onto.search(iri="*" + daira)[0])
 
     list_symptomes = symptomes.split(',')
     for j in list_symptomes:
