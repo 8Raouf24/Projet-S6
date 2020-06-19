@@ -1,4 +1,5 @@
 from owlready2 import *
+import pandas as pd
 
 
 
@@ -28,7 +29,7 @@ def create_patient(nom , prenom , age , sexe , maladiechronique , traitement , s
     P.Prenom.append(prenom)
     P.Age = age
     P.Sexe = sexe
-    P.MaladieChronique.append(maladiechronique)
+
     P.Traitement.append(traitement)
     P.SituationFamiliale.append(situationfam)
     P.DureeDepuisDernierVoyage.append(dureederniervoyage)
@@ -50,6 +51,14 @@ def create_patient(nom , prenom , age , sexe , maladiechronique , traitement , s
     else:
         P.estLocalise.append(onto.search(iri="*" + daira)[0])
 
+    if (onto.search(iri="*" + maladiechronique) == []):
+        class_mch = list_class[0]
+        M = class_mch()
+        M.iri = ns + maladiechronique
+        M.estMaladeDe.append(D)
+    else:
+        P.estMaladeDe.append(onto.search(iri="*" + daira)[0])
+
     list_symptomes = symptomes.split(',')
     for j in list_symptomes:
         if (onto.search(iri="*" + j) == []):
@@ -69,12 +78,19 @@ def create_medecin(nom , prenom , age , sexe):
     M.Sexe = sexe
 
 
+def fromcsvtordf(path):
+    patients = pd.read_csv(path)
+    for i in range(len(patients)):
+        patient = patients.iloc[i]
+        create_patient(patient[0], patient[1], int(patient[2]), patient[3], patient[4], patient[5], patient[6],int(patient[7]), int(patient[8]), patient[9], patient[10], patient[11])
 
 
 onto = get_ontology("F:\Raouf\Licence\L3\Web sémantique\Projet\sortie.owl").load()
 ns = "http://sararaouf.org/onto.owl#"
 
 list_class = enum_class(onto)
+
+fromcsvtordf("./test.csv")
 #
 #for i in onto.data_properties():
 #    pass
@@ -91,7 +107,8 @@ list_class = enum_class(onto)
 #
 #
 #
-##onto.save("sortiefinal.owl", format="ntriples")
+
+onto.save("sortiefinal.owl", format="ntriples")
 
 
 
