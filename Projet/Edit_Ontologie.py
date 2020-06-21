@@ -111,6 +111,27 @@ def enrichissementdaira(path):
         D.nomDaira = dairas.iloc[i]['nom'].replace(" ","_")
         D.communeDe.append(onto.search(iri ="*"+str(dairas.iloc[i]['wilaya_id']))[0])
 
+def enrichissementmaladies(path):
+    maladies = pd.read_csv(path)
+    for i in range(len(maladies)):
+        class_MaladieChronique = list_class[7]
+        M= class_MaladieChronique
+        nom_maladies =maladies.iloc[i].replace(" ","_")
+        M.iri = ns + "maladie" + str(maladies.iloc[i])
+        M.nommaladie = nom_maladies
+
+def enrichissementsymptomes(path):
+    symptomes = pd.read_csv(path)
+    for i in range(len(symptomes)):
+        class_Symptomes = list_class[0]
+        S= class_Symptomes
+        nom_symptomes =symptomes.iloc[i].replace(" ","_")
+        S.iri = ns + "symptome" + str(symptomes.iloc[i])
+        S.nomsymptomes = nom_symptomes
+
+
+
+
 
 
 
@@ -124,6 +145,9 @@ list_class = enum_class(onto)
 #fromcsvtordf("./test.csv")
 enrichissementwilaya("wilaya.csv")
 enrichissementdaira("communes.csv")
+enrichissementmaladies("maladie_chronique.csv")
+enrichissementsymptomes("sym.csv")
+
 
 
 
@@ -132,10 +156,10 @@ enrichissementdaira("communes.csv")
 #    print(wilayas.iloc[i]['nom'].replace(" ","_"))
 
 
-#
+
 #for i in onto.data_properties():
-#    pass
-#    #print(i)
+   #pass
+ # print(i)
 #
 ##create_patient("Cherif","Lena","21","Femme","","","Compliqué","15","25","BirKhadem",["Fievre","Toux"])
 ##create_patient("Djouadi","Mohamed","61","Homme","","","Marié","5","250","Adrar",["Fievre","Toux","Maux_de_tetes"])
@@ -150,7 +174,6 @@ enrichissementdaira("communes.csv")
 #
 
 onto.save("sortiefinal.owl", format="ntriples")
-
 
 
 
