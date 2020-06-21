@@ -45,8 +45,13 @@ with onto:
         pass
 
 
-    class MaladieChronique(Patient >> str):
+    class MaladieChronique(Thing):
         pass
+
+    class estMaladeDe(Patient >> MaladieChronique):
+        pass
+
+
 
 
     class Traitement(Patient >> str):
@@ -83,9 +88,28 @@ with onto:
         pass
 
 
-    class Daira(Localisation):
+    class nomWilaya(DataProperty,FunctionalProperty):
+        domain = [Wilaya]
+        range = [str]
+
+    class idWilaya(DataProperty,FunctionalProperty):
+        domain = [Wilaya]
+        range = [str]
         pass
 
+
+    class Daira(Wilaya):
+        pass
+
+    class nomDaira(DataProperty,FunctionalProperty):
+        domain = [Daira]
+        range = [str]
+
+
+    class communeDe(Daira >> Wilaya):
+        pass
+
+    #class wilayaDe()
 
     class estLocalise(Humain >> Localisation):
         pass
@@ -137,5 +161,7 @@ with onto:
 
     class typeOrientation(Fiche >> Orientation):
         pass
+
+
 
 onto.save("sortie.owl", format="ntriples")
