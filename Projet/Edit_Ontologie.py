@@ -47,7 +47,6 @@ def create_patient(nom , prenom , age , sexe , maladiechronique , traitement , s
         D = class_wilaya()
         D.iri = ns + wilaya
         P.estLocalise.append(D)
-
     else:
         P.estLocalise.append(onto.search(iri="*" + daira)[0])
 
@@ -87,12 +86,52 @@ def fromcsvtordf(path):
         create_patient(patient[0], patient[1], int(patient[2]), patient[3], patient[4], patient[5], patient[6],int(patient[7]), int(patient[8]), patient[9], patient[10], patient[11])
 
 
+def enrichissementwilaya(path):
+    wilayas = pd.read_csv(path)
+    for i in range(len(wilayas)):
+        class_wilaya = list_class[13]
+        W = class_wilaya()
+        nom_wilaya =  wilayas.iloc[i]['nom'].replace(" ","_")
+        W.iri = ns + "wilaya" + str(wilayas.iloc[i]['code'])
+        W.nomWilaya = nom_wilaya
+        code_wilaya = wilayas.iloc[i]['code']
+        W.idWilaya = str(code_wilaya)
+
+def enrichissementdaira(path):
+    dairas = pd.read_csv(path)
+    for i in range(len(dairas)):
+        class_daira = list_class[0]
+        D = class_daira()
+        #Le if suivant est pour reglé le probleme des communes dont l'id commence par un 0
+        if len(str(dairas.iloc[i]['code_postal'])) == 4:
+            D.iri = ns + "0"+ str(dairas.iloc[i]['code_postal'])
+        else:
+            D.iri = ns +   str(dairas.iloc[i]['code_postal'])
+        #print(D.iri)
+        D.nomDaira = dairas.iloc[i]['nom'].replace(" ","_")
+        D.communeDe.append(onto.search(iri ="*"+str(dairas.iloc[i]['wilaya_id']))[0])
+
+
+
+
+
+
 onto = get_ontology("F:\Raouf\Licence\L3\Web sémantique\Projet\sortie.owl").load()
 ns = "http://sararaouf.org/onto.owl#"
 
 list_class = enum_class(onto)
 
-fromcsvtordf("./test.csv")
+#fromcsvtordf("./test.csv")
+enrichissementwilaya("wilaya.csv")
+enrichissementdaira("communes.csv")
+
+
+
+#wilayas = pd.read_csv("wilaya.csv")
+#for i in range(len(wilayas)):
+#    print(wilayas.iloc[i]['nom'].replace(" ","_"))
+
+
 #
 #for i in onto.data_properties():
 #    pass
