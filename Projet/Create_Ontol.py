@@ -79,6 +79,11 @@ with onto:
         range = [str]
         pass
 
+    class medecinSpecialité(DataProperty, FunctionalProperty):
+        domain = [Medecin]
+        range = [str]
+        pass
+
 
     class Localisation(Thing):
         pass
@@ -109,9 +114,9 @@ with onto:
     class communeDe(Daira >> Wilaya):
         pass
 
-    #class wilayaDe()
 
-    class estLocalise(Humain >> Localisation):
+
+    class estLocalise(Thing >> Localisation):
         pass
 
 
@@ -138,7 +143,9 @@ with onto:
     class RDV(Orientation):
         pass
 
-
+    class dateRDV(RDV >> str):
+        pass
+    #Prise en charge
     class PCDomicile(Orientation):
         pass
 
@@ -159,7 +166,10 @@ with onto:
         pass
 
 
-    class typeOrientation(Fiche >> Orientation):
+    class estConcernéParOrientation(Patient >> Orientation):
+        pass
+
+    class prescritOrientation(Medecin >> Orientation):
         pass
 
 
