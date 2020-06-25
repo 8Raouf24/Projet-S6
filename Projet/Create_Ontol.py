@@ -17,7 +17,7 @@ with onto:
 
 
     class Age(DataProperty, FunctionalProperty):
-        range = [str]
+        range = [int]
         domain = [Humain]
 
 
@@ -46,6 +46,9 @@ with onto:
 
 
     class MaladieChronique(Thing):
+        pass
+
+    class nomMaladie(MaladieChronique >> str):
         pass
 
     class estMaladeDe(Patient >> MaladieChronique):
@@ -84,6 +87,8 @@ with onto:
         range = [str]
         pass
 
+    class Spécialité(Thing):
+        pass
 
     class Localisation(Thing):
         pass
@@ -103,8 +108,11 @@ with onto:
         pass
 
 
-    class Daira(Wilaya):
+    class Daira(Localisation):
         pass
+
+
+    AllDisjoint([Daira, Wilaya])
 
     class nomDaira(DataProperty,FunctionalProperty):
         domain = [Daira]
@@ -162,8 +170,7 @@ with onto:
         pass
 
 
-    class DateFiche(Fiche >> datetime.date):
-        pass
+
 
 
     class estConcernéParOrientation(Patient >> Orientation):
