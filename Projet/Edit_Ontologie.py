@@ -84,7 +84,7 @@ def create_patient(ID,nom, prenom, age, sexe, maladiechronique, traitement, situ
     list_symptomes = symptomes.split(',')
     for j in list_symptomes:
         if (onto.search(iri="*" + j) == []):
-            class_symp = list_class[11]
+            class_symp = list_class[12]
             S = class_symp()
             S.iri = ns + j.replace(" ", "_")
 
@@ -147,7 +147,7 @@ def orientation(type_orientation,IDmedecin,IDpatient):
         class_pec = list_class[8]
         pec = class_pec()
         pec.nomOrientation.append(type_orientation)
-        patient.estConcernéParOrientation.append(pec)
+        patient.estConcerneParOrientation.append(pec)
         medecin.prescritOrientation.append(pec)
         print("orientation faite")
 
@@ -155,7 +155,7 @@ def orientation(type_orientation,IDmedecin,IDpatient):
         class_hop = list_class[2]
         hop = class_hop()
         hop.nomOrientation.append(type_orientation)
-        patient.estConcernéParOrientation.append(hop)
+        patient.estConcerneParOrientation.append(hop)
         medecin.prescritOrientation.append(hop)
         print("orientation faite")
 
@@ -163,7 +163,7 @@ def orientation(type_orientation,IDmedecin,IDpatient):
         class_rdv = list_class[10]
         rdv = class_rdv()
         rdv.nomOrientation.append(type_orientation)
-        patient.estConcernéParOrientation.append(rdv)
+        patient.estConcerneParOrientation.append(rdv)
         medecin.prescritOrientation.append(rdv)
         print("orientation faite")
 
@@ -201,7 +201,7 @@ def créationfiche(IDpatient):
     ?daira ns1:communeDe ?wilaya .
     ?daira ns1:nomDaira ?ndaira .
     ?wilaya ns1:nomWilaya ?nwilaya .
-    ?p ns1:estConcernéParOrientation ?orientation .
+    ?p ns1:estConcerneParOrientation ?orientation .
     ?m ns1:prescritOrientation ?orientation .
     ?orientation ns1:nomOrientation ?norientation .
     ?m ns1:medecinID ?idmed .
@@ -320,8 +320,7 @@ graph.serialize("sortieturtle.rdf",format="turtle")
 #orientation("Prise en charge a domicile","0002",1)
 
 
-générationfiches()
-
+#générationfiches()
 
 
 
