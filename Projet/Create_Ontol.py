@@ -1,4 +1,6 @@
 from owlready2 import *
+import rdflib
+
 
 default_world.set_backend(filename="file_back3.sqlite3", exclusive=False)
 
@@ -153,10 +155,13 @@ with onto:
 
     class dateRDV(RDV >> str):
         pass
+
     #Prise en charge
     class PCDomicile(Orientation):
         pass
 
+    class nomOrientation(Orientation >> str):
+        pass
 
     class Fiche(Thing):
         pass
@@ -182,3 +187,8 @@ with onto:
 
 
 onto.save("sortie.owl", format="ntriples")
+
+
+
+
+
