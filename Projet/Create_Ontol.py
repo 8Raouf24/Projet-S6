@@ -89,7 +89,7 @@ with onto:
         range = [str]
         pass
 
-    class Spécialité(Thing):
+    class Specialite(Thing):
         pass
 
     class Localisation(Thing):
@@ -114,7 +114,7 @@ with onto:
         pass
 
 
-    AllDisjoint([Daira, Wilaya])
+
 
     class nomDaira(DataProperty,FunctionalProperty):
         domain = [Daira]
@@ -178,12 +178,13 @@ with onto:
 
 
 
-    class estConcernéParOrientation(Patient >> Orientation):
+    class estConcerneParOrientation(Patient >> Orientation):
         pass
 
     class prescritOrientation(Medecin >> Orientation):
         pass
 
+    AllDisjoint([Daira, Wilaya,Specialite,Symptomes,MaladieChronique,Patient,Medecin,Orientation,])
 
 
 onto.save("sortie.owl", format="ntriples")
