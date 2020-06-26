@@ -1,7 +1,7 @@
 from owlready2 import *
 import rdflib
 import pandas as pd
-
+import  csv
 #On inovque cette fonction afin de pouvoir ordonner les classes de notre ontologie dans une liste afin de pouvoir instancier les classes directement
 def ordonner_classe(ontol):
     d = {}
@@ -48,6 +48,7 @@ def create_patient(ID,nom, prenom, age, sexe, maladiechronique, traitement, situ
     #On utilise une requete sparql afin de trouver la daira et wilaya de notre patient et lié notre patient a eux via une relation "estLocalise"
     requete = """
     prefix ns1: <http://sararaouf.org/onto.owl#> 
+    prefix ns2: <http://www.w3.org/2002/07/owl#> 
     prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
     prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
     prefix xml: <http://www.w3.org/XML/1998/namespace> 
@@ -103,7 +104,7 @@ def create_medecin(ID,nom, prenom, sexe):
 
 #Cette fonction nous permets de traduire un fichier csv et l'inserer dans notre base rdf
 def fromcsvtordf(path):
-    patients = pd.read_csv(path)
+    patients = pd.read_csv(path,encoding='latin-1')
     for i in range(len(patients)):
         patient = patients.iloc[i]
         create_patient(patient[0], patient[1], patient[2], int(patient[3]), patient[4], patient[5], patient[6],
@@ -113,7 +114,7 @@ def fromcsvtordf(path):
 def enrichissementwilaya(path):
     wilayas = pd.read_csv(path)
     for i in range(len(wilayas)):
-        class_wilaya = list_class[13]
+        class_wilaya = list_class[14]
         W = class_wilaya()
         nom_wilaya = wilayas.iloc[i]['nom'].replace(" ", "_")
         W.iri = ns + "wilaya" + str(wilayas.iloc[i]['code'])
@@ -140,39 +141,49 @@ def enrichissementdaira(path):
 def orientation(type_orientation,IDmedecin,IDpatient):
     patient = onto.search(iri=ns + "patient" + str(IDpatient))[0]
     medecin = onto.search(iri=ns + "medecin" + str(IDmedecin))[0]
-
+    print(patient )
+    print(medecin)
     if type_orientation == "Prise en charge a domicile":
         class_pec = list_class[8]
         pec = class_pec()
+        pec.nomOrientation.append(type_orientation)
         patient.estConcernéParOrientation.append(pec)
         medecin.prescritOrientation.append(pec)
+        print("orientation faite")
 
     if type_orientation == "Redirection vers hopital":
         class_hop = list_class[2]
         hop = class_hop()
+        hop.nomOrientation.append(type_orientation)
         patient.estConcernéParOrientation.append(hop)
         medecin.prescritOrientation.append(hop)
+        print("orientation faite")
 
     if type_orientation == "Prise de rendez-vous":
         class_rdv = list_class[10]
         rdv = class_rdv()
+        rdv.nomOrientation.append(type_orientation)
         patient.estConcernéParOrientation.append(rdv)
         medecin.prescritOrientation.append(rdv)
+        print("orientation faite")
 
 
 #Cette fonction nous permets de créer une fiche pour un patient en recoltant ses informations via une requete sparql
 def créationfiche(IDpatient):
+
+    dic_info={}
     list_info = []
     list_symp = []
     list_malad = []
     list_med = []
     requete = """
-    prefix ns1: <http://sararaouf.org/onto.owl#>
+    prefix ns1: <http://sararaouf.org/onto.owl#> 
+    prefix ns2: <http://www.w3.org/2002/07/owl#> 
     prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     prefix xml: <http://www.w3.org/XML/1998/namespace>
     prefix xsd: <http://www.w3.org/2001/XMLSchema#>
-    SELECT  ?id ?nom  ?age ?sexe ?dureevoyage ?dureesymp ?prenom  ?traitement ?situationfam  ?ndaira  ?nwilaya ?s ?maladiechronique ?orientation ?idmed ?nommed
+    SELECT  ?id ?nom ?prenom  ?age ?sexe ?situationfam ?dureevoyage ?dureesymp   ?traitement   ?ndaira  ?nwilaya ?s ?maladiechronique ?norientation ?idmed ?nommed
     WHERE{
     ?p rdf:type ns1:Patient .
     ?p ns1:patientID ?id .
@@ -192,16 +203,18 @@ def créationfiche(IDpatient):
     ?wilaya ns1:nomWilaya ?nwilaya .
     ?p ns1:estConcernéParOrientation ?orientation .
     ?m ns1:prescritOrientation ?orientation .
+    ?orientation ns1:nomOrientation ?norientation .
     ?m ns1:medecinID ?idmed .
     ?m ns1:Nom ?nommed .
     FILTER regex(?id , "^var")
     }
-     """.replace("var", IDpatient)
+        """.replace("var", IDpatient)
     result = graph.query(requete)
-
-    #Ici on receuille les infos fixes du patient ( pourquoi fixe ?car un patient peut avoir plusieurs symptomes / maladie chronique et donc le résultat de  la requete sparql sera sur plusieurs lignes)
+    for i in result:
+        print(i)
+    # Ici on receuille les infos fixes du patient ( pourquoi fixe ?car un patient peut avoir plusieurs symptomes / maladie chronique et donc le résultat de  la requete sparql sera sur plusieurs lignes)
     for i in range(11):
-        list_info.append( list(result)[0][i])
+        list_info.append(list(result)[0][i])
 
     #Donc on utilise cette fonction pour receuillir les maladies chroniques
     for i in result:
@@ -210,49 +223,120 @@ def créationfiche(IDpatient):
 
     #Et celle la pour les symptomes
     for i in result:
-        if str(i[11]).split('#')[1] not in list_malad:
+        if str(i[11]).split('#')[1] not in list_symp:
             list_symp.append(str(i[11]).split('#')[1])
 
     for i in range(13,16):
         list_med.append(list(result)[0][i])
 
 
+#?id ?nom ?prenom  ?age ?sexe ?situationfam ?dureevoyage ?dureesymp   ?traitement   ?ndaira  ?nwilaya ?s ?maladiechronique ?orientation ?idmed ?nommed
+    dic_info['Id'] = list_info[0]
+    dic_info['Nom'] = list_info[1]
+    dic_info['Prenom'] = list_info[2]
+    dic_info['Age'] = list_info[3]
+    dic_info['Sexe'] = list_info[4]
+    dic_info['Situation familiale'] = list_info[5]
+    dic_info['Durée depuis dernier voyage'] = list_info[6]
+    dic_info['Durée depuis apparition des symptomes'] = list_info[7]
+    dic_info['Traitement suivi'] = list_info[8]
+    dic_info['Daira de résidence'] = list_info[9]
+    dic_info['Wilaya de résidence'] = list_info[10]
+    dic_info['Maladies chroniques'] = list_malad
+    dic_info['Symptomes'] = list_symp
+    dic_info['Orientation prescrite'] = list_med[0]
+    dic_info['Id  medecin en charge'] = list_med[1]
+    dic_info['Nom du medecin en charge'] = list_med[2]
+
+    dict_fiches.append(dic_info)
+    return dic_info.keys()
+
+
+#Cette fonction nous permettra de générer un fichier csv contenant l'ensemble des patients avec leurs informations personnels en plus de leur orientation et le medecin en charge de l'orientation
+def générationfiches():
+    requete = """
+        prefix ns1: <http://sararaouf.org/onto.owl#> 
+        prefix ns2: <http://www.w3.org/2002/07/owl#> 
+        prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        prefix xml: <http://www.w3.org/XML/1998/namespace>
+        prefix xsd: <http://www.w3.org/2001/XMLSchema#>
+        SELECT  ?p
+        WHERE{
+        ?p rdf:type ns1:Patient     
+        }
+         """
+    result = graph.query(requete)
+    for i in result:
+        print(i)
+    for i in range(len(list(result))):
+        col = créationfiche(str(i+1))
+    csv_file = "fiches.csv"
+    csv_columns = col
+    with open(csv_file, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
+        writer.writeheader()
+        for data in dict_fiches:
+            writer.writerow(data)
 
 
 
 
 
 
+#--------------------------------------------------------------------------------------------------------------------------------
+#Main
+
+
+#On recupere notre ontologie
 onto = get_ontology("F:\Raouf\Licence\L3\Web sémantique\Projet\sortiefinal.owl").load()
 ns = "http://sararaouf.org/onto.owl#"
 
-#pour ce qui est de rdf
-graph = rdflib.Graph()
-graph.parse("sortiefinal.owl", format="turtle")
-open("sortielib.rdf","w")
-graph.serialize("sortielib.rdf",format="turtle")
-
+#On appelle la fonction pour classer les classes et les récuperer
 list_class = enum_class(onto)
+
+dict_fiches=[]
+
+#on utilise rdflib afin de concevoir le graph sur lequel nous appliquerons nos requetes
+
+
+graph = rdflib.Graph()
+graph.parse("sortiefinal.owl",format="turtle")
+open("sortieturtle.rdf","w")
+graph.serialize("sortieturtle.rdf",format="turtle")
+
+
+
+
+
 
 
 #enrichissementwilaya("wilaya.csv")
 #enrichissementdaira("communes.csv")
 #fromcsvtordf("./test.csv")
 #
-#
-#
 #create_medecin('0002',"Bakir","Djamal","Homme")
+#orientation("Redirection vers hopital","0002",2)
 #orientation("Prise en charge a domicile","0002",1)
-créationfiche("1")
-
-#pour invoquer le raisonneur
 
 
+générationfiches()
 
+
+
+
+
+
+#On invoque le raisonneur Hermit
 owlready2.JAVA_EXE = "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath\\java.exe"
-#sync_reasoner()
+sync_reasoner()
 
+
+#On sauvegarde notre ontologie
 onto.save("sortiefinal.owl", format="ntriples")
 
 
-# onto.save("sortierdf.rdf",format="ntriples")
+
+
+onto.save("sortiefinalxml.owl")
+
