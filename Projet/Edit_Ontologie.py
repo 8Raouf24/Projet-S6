@@ -72,28 +72,75 @@ def create_patient(ID,nom, prenom, age, sexe, maladiechronique, traitement, situ
     #Au lieu d'utiliser une requete sparql , on utilise la fonction search de owlready afin de pouvoir trouver les maladies chroniques de patient existante dans notre base rdf pour les lier , et si il n'existe pas on le crée puis on les lie
     list_maladiechronique = maladiechronique.split(',')
     for j in list_maladiechronique:
-        if (onto.search(iri="*" + maladiechronique) == []):
+        requete = """
+                    prefix ns1: <http://sararaouf.org/onto.owl#> 
+                    prefix ns2: <http://www.w3.org/2002/07/owl#> 
+                    prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+                    prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+                    prefix xml: <http://www.w3.org/XML/1998/namespace> 
+                    prefix xsd: <http://www.w3.org/2001/XMLSchema#> 
+                    SELECT     ?m ?mn
+                    WHERE{
+                    ?m rdf:type ns1:MaladieChronique .
+                    ?m ns1:nomMaladie ?mn.
+                     FILTER regex(?mn,"var")  
+                    }
+                    """.replace("var", j.replace(" ", "_"))
+        result = graph.query(requete)
+        if (list(result) == []):
             class_mch = list_class[5]
             M = class_mch()
-            M.iri = ns + j.replace(" ", "_")
+            M.nomMaladie = ns + j.replace(" ", "_")
             P.estMaladeDe.append(M)
         else:
-            P.estMaladeDe.append(onto.search(iri="*" + j)[0])
+            P.estMaladeDe.append(onto.search(iri=list(result)[0][0])[0])
 
     #Meme procede que les maladies chroniques pour les symptomes
     list_symptomes = symptomes.split(',')
     for j in list_symptomes:
-        if (onto.search(iri="*" + j) == []):
-            class_symp = list_class[12]
-            S = class_symp()
-            S.iri = ns + j.replace(" ", "_")
-
-            P.aSymptomes.append(S)
+        requete = """
+            prefix ns1: <http://sararaouf.org/onto.owl#> 
+            prefix ns2: <http://www.w3.org/2002/07/owl#> 
+            prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+            prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+            prefix xml: <http://www.w3.org/XML/1998/namespace> 
+            prefix xsd: <http://www.w3.org/2001/XMLSchema#> 
+            SELECT     ?s ?sn
+            WHERE{
+            ?s rdf:type ns1:Symptomes .
+            ?s ns1:nomSymptomes ?sn.
+             FILTER regex(?sn,"var")  
+            }
+            """.replace("var",j.replace(" ","_"))
+        result = graph.query(requete)
+        if (list(result) == []):
+            requete = """
+                        prefix ns1: <http://sararaouf.org/onto.owl#> 
+                        prefix ns2: <http://www.w3.org/2002/07/owl#> 
+                        prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+                        prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+                        prefix xml: <http://www.w3.org/XML/1998/namespace> 
+                        prefix xsd: <http://www.w3.org/2001/XMLSchema#> 
+                        SELECT     ?s ?sn
+                        WHERE{
+                        ?s rdf:type ns1:SymptomesCovid .
+                        ?s ns1:nomSymptomes ?sn.
+                        FILTER regex(?sn,"var")  
+                        }
+                        """.replace("var",j.replace(" ","_"))
+            result = graph.query(requete)
+            if(list(result)==[]):
+                class_symp = list_class[12]
+                S = class_symp()
+                S.nomSymptomes = j.replace(" ", "_")
+                P.aSymptomes.append(S)
+            else:
+                P.aSymptomes.append(onto.search(iri=list(result)[0][0])[0])
         else:
-            P.aSymptomes.append(onto.search(iri="*" + j)[0])
+            P.aSymptomes.append(onto.search(iri=list(result)[0][0])[0])
 
 #Cette fonction quant a elle nous permets de créer un objet medecin dans notre base rdf
-def create_medecin(ID,nom, prenom, sexe):
+def create_medecin(ID,nom, prenom, sexe,specialite):
     class_medecin = list_class[6]
     M = class_medecin()
     M.iri = ns +"medecin"+ str(ID)
@@ -101,6 +148,22 @@ def create_medecin(ID,nom, prenom, sexe):
     M.Nom = nom
     M.Prenom.append(prenom)
     M.Sexe = sexe
+    requete = """
+    prefix ns1: <http://sararaouf.org/onto.owl#> 
+    prefix ns2: <http://www.w3.org/2002/07/owl#> 
+    prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+    prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+    prefix xml: <http://www.w3.org/XML/1998/namespace> 
+    prefix xsd: <http://www.w3.org/2001/XMLSchema#> 
+    SELECT     ?s ?ns
+    WHERE{
+    ?d rdf:type ns1:Specialite .
+    ?s ns1:nomSpecialite ?ns .
+    FILTER regex(?ns,"var1")  
+    }
+    """.replace("var1", specialite)
+    result = graph.query(requete)
+    M.estSpecialise.append(onto.search(iri=list(result)[0][0])[0])
 
 #Cette fonction nous permets de traduire un fichier csv et l'inserer dans notre base rdf
 def fromcsvtordf(path):
@@ -109,6 +172,9 @@ def fromcsvtordf(path):
         patient = patients.iloc[i]
         create_patient(patient[0], patient[1], patient[2], int(patient[3]), patient[4], patient[5], patient[6],
                        patient[7], int(patient[8]), int(patient[9]), patient[10], patient[11],patient[12])
+
+
+#Les fonctions d'enrichissements
 
 #Cette fonction nous a permit d'enrichir notre base rdf en insérant les wilayas quand on  a pu trouvé dans un fichier csv qu'un saint samaritain nous a donné
 def enrichissementwilaya(path):
@@ -136,6 +202,46 @@ def enrichissementdaira(path):
         # print(D.iri)
         D.nomDaira = dairas.iloc[i]['nom'].replace(" ", "_")
         D.communeDe.append(onto.search(iri="*" +"wilaya"+ str(dairas.iloc[i]['wilaya_id']))[0])
+
+#On enrichit notre base de donnés avec les symptomes fréquents du covid trouvés sur internet
+def enrichissementsympcov(path):
+    f = open(path,"r")
+    sympcov = f.readlines()
+    for i in sympcov:
+        class_sympcov = list_class[13]
+        SC = class_sympcov()
+        SC.nomSymptomes = i.capitalize().replace(" ","_").replace("\n","")
+
+#Quand a ceux la , ce sont les symptomes qui n'ont pas de rapports avec le covid
+def enrichissementsymp(path):
+    f = open(path,"r",encoding="utf-8")
+    symp = f.readlines()
+    for i in symp:
+        class_symp = list_class[12]
+        S = class_symp()
+        S.nomSymptomes = i.capitalize().replace(" ","_").replace("\n","")
+    pass
+
+#Enrichissement des maladies chroniques
+def enrichissementmaladiechronique(path):
+    f = open(path,"r",encoding="utf-8")
+    maladies = f.readlines()
+    for i in maladies:
+        class_maladiechro = list_class[5]
+        M = class_maladiechro()
+        M.nomMaladie = i.capitalize().replace(" ","_").replace("\n","")
+
+
+def enrichissementspecialite(path):
+    f = open(path,"r",encoding="utf-8")
+    specialites = f.readlines()
+    for i in specialites:
+        class_spe = list_class[11]
+        SP = class_spe()
+        SP.nomSpecialite = i.capitalize().replace(" ","_").replace("\n","")
+
+
+
 
 #Cette fonction nous permets de relié l'orientation donné par un medecin sur un patient donné
 def orientation(type_orientation,IDmedecin,IDpatient):
@@ -311,11 +417,20 @@ graph.serialize("sortieturtle.rdf",format="turtle")
 
 
 
+
 #enrichissementwilaya("wilaya.csv")
 #enrichissementdaira("communes.csv")
+#enrichissementsymp("sym.txt")
+#enrichissementsympcov("sym_covid.txt")
+#enrichissementmaladiechronique("maladie_chronique.txt")
+#enrichissementspecialite("specialite_medecine.txt")
+
 #fromcsvtordf("./test.csv")
+
 #
-#create_medecin('0002',"Bakir","Djamal","Homme")
+#create_medecin('0002',"Bakir","Djamal","Homme","Pédiatrie")
+
+
 #orientation("Redirection vers hopital","0002",2)
 #orientation("Prise en charge a domicile","0002",1)
 
