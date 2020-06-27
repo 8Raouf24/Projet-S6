@@ -50,7 +50,9 @@ with onto:
     class MaladieChronique(Thing):
         pass
 
-    class nomMaladie(MaladieChronique >> str):
+    class nomMaladie(DataProperty,FunctionalProperty):
+        domain = [MaladieChronique]
+        range = [str]
         pass
 
     class estMaladeDe(Patient >> MaladieChronique):
@@ -84,12 +86,17 @@ with onto:
         range = [str]
         pass
 
-    class medecinSpecialité(DataProperty, FunctionalProperty):
-        domain = [Medecin]
+
+
+    class Specialite(Thing):
+        pass
+
+    class nomSpecialite(DataProperty, FunctionalProperty):
+        domain = [Specialite]
         range = [str]
         pass
 
-    class Specialite(Thing):
+    class estSpecialise(Medecin >> Specialite):
         pass
 
     class Localisation(Thing):
@@ -137,6 +144,9 @@ with onto:
     class SymptomesCovid(Symptomes):
         pass
 
+    class nomSymptomes(DataProperty,FunctionalProperty):
+        domain = [Symptomes]
+        range = [str]
 
     class aSymptomes(Patient >> Symptomes):
         pass
