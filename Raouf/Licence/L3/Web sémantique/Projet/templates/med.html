@@ -1,0 +1,127 @@
+{%extends 'base.html' %}
+
+{% block head  %} 
+<title>Projet WS</title>
+
+<style type="text/css">
+		
+		body{
+		    min-height: 100vh;
+            display: flex;
+            justify-content: center;
+			background-image:url("{{url_for('static', filename='med.jpg')}}");
+			background-size: cover;
+			background-attachment: fixed;
+		}
+
+		.content{
+			background: white;
+			width: 50%;
+			padding: 40px;
+			margin: 100px auto;
+			font-family: calibri;
+			border-radius: 10px;
+		}
+
+		p{
+			font-size: 25px;
+			color: black;
+		}
+
+    
+</style>
+{% endblock %}
+
+{% block body  %} 
+<div class="container">
+    <div class="jumbotron text-white text-center">
+        <h1 class="display-4"> informations personnelles concernant le medecin:</h1>
+        <form action="/consultation" method="POST">
+            <form action="/consultation" method="POST">
+                <div class="form-group row">
+                    <div class="col-6">
+                        <input
+                            type="text"
+                            required
+                            placeholder="ID"
+                            class="form-control"
+                            id="ID"
+                            name="ID"
+                        />
+                    </div>
+                    <div class="col-6">
+                        <input
+                            type="text"
+                            required
+                            placeholder="Prenom"
+                            class="form-control"
+                            id="prenom"
+                            name="prenom"
+                        />
+                    </div>
+                    <div class="col-6">
+                        <input
+                            type="text"
+                            required
+                            placeholder="Nom"
+                            class="form-control"
+                            id="nom"
+                            name="nom"
+                        />
+                    </div>
+                </div>
+                <div class="from-group row">
+                    <div class="col-2">
+                        <input
+                            type="text"
+                            required
+                            placeholder="Sexe"
+                            class="form-control"
+                            id="sexe"
+                            name="sexe"
+                        />
+                    </div>
+                    <div class="col-2">
+                        <input
+                            type="text"
+                            required
+                            placeholder="Age"
+                            class="form-control"
+                            id="age"
+                            name="age"
+                        />
+                    </div>
+                    <div>
+                        <div class="col-12">
+                            <input
+                                type="text"
+                                
+                                required
+                                placeholder="orientation a suivre   "
+                                class="form-control"
+                                id="orientation"
+                                name="orientation"
+                            />
+
+                    </div>
+                        </div>
+                      
+                    
+                    
+                    
+                    
+                </div>
+                <div class="col-12 text-center">
+                  <button type="button" class="btn btn-success">Submit</button>
+
+                </div>
+            </form>
+
+                
+        </form>
+       
+  </div>
+</div>
+
+
+{% endblock %}

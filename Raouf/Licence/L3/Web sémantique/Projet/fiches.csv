@@ -1,0 +1,3 @@
+Id,Nom,Prenom,Age,Sexe,Situation familiale,Durée depuis dernier voyage,Durée depuis apparition des symptomes,Traitement suivi,Daira de résidence,Wilaya de résidence,Maladies chroniques,Symptomes,Orientation prescrite,Id  medecin en charge,Nom du medecin en charge
+1,Djebara,Ghiles,69,Homme,Divorcé,1,25487,Soukout,Bounouh,Tizi_Ouzou,['Khchanat_rass'],"['symptomescovid1', 'symptomes233']",Prise en charge a domicile,0002,Bakir
+2,Benzeid,Houda,14,Femme,Divorcé,154,457,Antidepresseurs,Draria,Alger,['Tension_arterielle'],"['symptomes164', 'symptomescovid1']",Redirection vers hopital,0002,Bakir

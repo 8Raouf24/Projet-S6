@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="file_back3" uuid="b4e7ef76-2bcf-4047-8253-85b203a70348">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:F:\Raouf\Licence\L3\Web sémantique\Projet\file_back3.sqlite3</jdbc-url>
+    </data-source>
+  </component>
+</project>
